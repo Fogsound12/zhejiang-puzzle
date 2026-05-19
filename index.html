@@ -196,11 +196,12 @@ header p {
 .puzzle-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: repeat(3, 1fr);
     gap: 3px;
     width: 100%;
+    aspect-ratio: 4 / 3;
 }
 .piece-cell {
-    aspect-ratio: 1;
     background-repeat: no-repeat;
     border-radius: 6px;
     cursor: pointer;
@@ -462,8 +463,26 @@ function buildGrid() {
         cell.addEventListener("click", () => onCellClick(i));
         grid.appendChild(cell);
     }
-    shufflePieces();
-    requestAnimationFrame(() => requestAnimationFrame(renderAllPieces));
+    // Wait 3 frames for CSS Grid + aspect-ratio to compute layout
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                // Force explicit cell sizing as fallback
+                const cells = grid.querySelectorAll(".piece-cell");
+                let cw = cells[0].offsetWidth;
+                let ch = cells[0].offsetHeight;
+                if (cw === 0 || ch === 0) {
+                    // Manual size calc
+                    const gap = 3;
+                    const gW = grid.offsetWidth;
+                    cw = Math.floor((gW - gap * (COLS - 1)) / COLS);
+                    ch = cw;
+                    cells.forEach(c => { c.style.width = cw + "px"; c.style.height = ch + "px"; });
+                }
+                shufflePieces();
+            });
+        });
+    });
 }
 
 function shufflePieces() {
@@ -525,8 +544,8 @@ function renderPiece(idx, cells) {
     const pieceId = state.positions[idx];
     const col = pieceId % COLS;
     const row = Math.floor(pieceId / COLS);
-    const cw = cell.offsetWidth, ch = cell.offsetHeight;
-    if (cw === 0 || ch === 0) return;
+    const cw = cell.offsetWidth - 4, ch = cell.offsetHeight - 4; // subtract border (2px each side)
+    if (cw <= 4 || ch <= 4) return;
     const iw = state.imageNatural.w, ih = state.imageNatural.h;
     if (iw === 0 || ih === 0) return;
 
