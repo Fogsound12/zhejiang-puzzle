@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<title>浙江城市美食记忆拼图</title>
+<title>浙江寻宝记云上展（寻味浙江）</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden;touch-action:none}
@@ -14,28 +14,21 @@ body{
 .screen{display:none;height:100%;flex-direction:column}
 .screen.active{display:flex}
 
-/* ===== Stars ===== */
 .stars{position:fixed;inset:0;pointer-events:none;z-index:-1;overflow:hidden}
 .star{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.3;animation:twinkle 3s ease-in-out infinite}
 @keyframes twinkle{0%,100%{opacity:.2}50%{opacity:.6}}
 
-/* ===== City Select ===== */
 #screen-select{overflow-y:auto;display:none}
 #screen-select.active{display:block;touch-action:auto}
 header{text-align:center;padding:20px 16px 12px}
 header h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 header p{color:#888;font-size:13px;margin-top:4px}
-.qr-section{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px auto 0;flex-wrap:wrap}
-.qr-section img{width:50px;height:50px;border-radius:6px;border:1px solid #333}
-.qr-section .url-text{font-size:10px;color:#666;word-break:break-all;line-height:1.3}
-.qr-section .url-text a{color:#f7971e;text-decoration:none}
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:12px 16px 24px;max-width:850px;margin:0 auto}
 .city-card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background:#1a1a2e;border:2px solid #2a2a3e;transition:transform .2s}
 .city-card:active{transform:scale(.96)}
 .city-card img{width:100%;height:100%;object-fit:cover;display:block}
 .city-card .label{position:absolute;bottom:0;left:0;right:0;padding:24px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:15px;font-weight:600;color:#fff;text-align:center}
 
-/* ===== Puzzle Screen ===== */
 #screen-puzzle{height:100%;display:none;flex-direction:column;touch-action:none}
 #screen-puzzle.active{display:flex}
 
@@ -50,7 +43,6 @@ header p{color:#888;font-size:13px;margin-top:4px}
 .btn-back:active{background:#3a3a4e}
 .puzzle-header h2{font-size:17px;font-weight:700;color:#f7971e}
 
-/* ===== Board ===== */
 .board-wrap{
   flex:1;display:flex;flex-direction:column;align-items:center;
   justify-content:center;padding:6px 12px 4px;min-height:0;position:relative;overflow:hidden;touch-action:none
@@ -75,7 +67,6 @@ header p{color:#888;font-size:13px;margin-top:4px}
 .board-cell.correct{border-color:#4caf50;border-style:solid;border-width:3px;box-shadow:inset 0 0 8px rgba(76,175,80,.2)}
 .board-cell.drag-over{border-color:#f7971e;background:rgba(247,151,30,.1);border-style:solid}
 
-/* ===== Tray ===== */
 .tray-wrap{
   flex-shrink:0;background:#12122a;border-top:1px solid rgba(255,255,255,.08);
   padding:6px 12px 12px;max-height:38vh;overflow-y:auto;touch-action:auto
@@ -91,38 +82,64 @@ header p{color:#888;font-size:13px;margin-top:4px}
 .tray-piece img{width:100%;height:100%;display:block;object-fit:cover;pointer-events:none}
 .tray-piece.dragging{opacity:.3;transform:scale(.9)}
 .tray-empty{color:#555;text-align:center;padding:8px;font-size:12px;grid-column:1/-1}
-.tray-piece.placed-anim{animation:pop .3s ease}
-@keyframes pop{0%{transform:scale(1)}50%{transform:scale(1.15)}100%{transform:scale(0)}}
 
-/* ===== Drag ghost ===== */
 .drag-ghost{
   position:fixed;z-index:1000;pointer-events:none;touch-action:none;
   border-radius:8px;overflow:hidden;box-shadow:0 8px 30px rgba(0,0,0,.5);
-  transition:box-shadow .2s;border:2px solid #f7971e
+  border:2px solid #f7971e;will-change:transform
 }
 .drag-ghost img{width:100%;height:100%;display:block;object-fit:cover;pointer-events:none}
 
-/* ===== Victory ===== */
+/* Victory Modal */
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);display:flex;align-items:center;justify-content:center;z-index:100;animation:fadeIn .4s}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 .modal-content{
   background:linear-gradient(135deg,#1a1a2e,#16213e);border:2px solid #f7971e;
-  border-radius:20px;padding:36px 28px 28px;text-align:center;max-width:360px;width:88%;
-  animation:scaleIn .5s cubic-bezier(.175,.885,.32,1.275);position:relative;z-index:101
+  border-radius:20px;padding:28px 24px 24px;text-align:center;max-width:360px;width:90%;
+  animation:scaleIn .5s cubic-bezier(.175,.885,.32,1.275);position:relative;z-index:101;
+  max-height:90vh;overflow-y:auto
 }
 @keyframes scaleIn{from{transform:scale(.5);opacity:0}to{transform:scale(1);opacity:1}}
-.modal-icon{font-size:44px;margin-bottom:10px;line-height:1}
-.modal-content h2{font-size:20px;font-weight:700;color:#ffd200;margin-bottom:6px;line-height:1.4}
-.modal-content .sub-text{color:#aaa;font-size:13px;margin-bottom:18px}
+
+/* Certificate */
+.cert-wrap{margin-bottom:16px;position:relative}
+.cert-img{
+  width:100%;max-width:240px;border-radius:12px;cursor:pointer;
+  border:2px solid rgba(255,215,0,.3);transition:transform .2s;display:block;margin:0 auto
+}
+.cert-img:active{transform:scale(.98)}
+.cert-overlay{
+  position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:200;
+  display:flex;align-items:center;justify-content:center;
+  animation:fadeIn .3s;padding:20px
+}
+.cert-overlay img{
+  max-width:100%;max-height:100%;border-radius:12px;
+  border:2px solid rgba(255,215,0,.3);object-fit:contain
+}
+.cert-overlay .cert-close{
+  position:absolute;top:20px;right:20px;background:rgba(255,255,255,.2);
+  border:none;color:#fff;font-size:28px;width:44px;height:44px;
+  border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center
+}
+.modal-content h2{font-size:18px;font-weight:700;color:#ffd200;margin-bottom:4px;line-height:1.4}
+.modal-content .sub-text{color:#aaa;font-size:12px;margin-bottom:12px}
 .modal-content .sub-text span{color:#ffd200;font-weight:700}
+.modal-content .sub-text .city-label{color:#f7971e}
+.btn-row{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
 .btn-primary{
   background:linear-gradient(135deg,#f7971e,#ffd200);border:none;color:#1a1a2e;
-  font-weight:700;padding:10px 28px;border-radius:10px;cursor:pointer;font-size:15px;
+  font-weight:700;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:14px;
   transition:transform .2s
 }
 .btn-primary:active{transform:scale(.96)}
+.btn-secondary{
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.2);color:#ddd;
+  font-weight:600;padding:10px 20px;border-radius:10px;cursor:pointer;font-size:14px;
+  transition:background .2s
+}
+.btn-secondary:active{background:rgba(255,255,255,.2)}
 
-/* ===== Confetti ===== */
 #confettiCanvas{position:fixed;inset:0;pointer-events:none;z-index:99}
 </style>
 </head>
@@ -130,37 +147,26 @@ header p{color:#888;font-size:13px;margin-top:4px}
 
 <div class="stars" id="stars"></div>
 
-<!-- Screen 1: Select -->
 <div class="screen active" id="screen-select">
   <header>
-    <h1>浙江城市美食记忆拼图</h1>
+    <h1>浙江寻宝记云上展（寻味浙江）</h1>
     <p>选择一座城市，拼回它的美食记忆碎片</p>
-    <div class="qr-section">
-      <img src="QR码.png" alt="扫码">
-      <div class="url-text">
-        扫码游玩<br>
-        <a href="https://fogsound12.github.io/zhejiang-puzzle/" target="_blank">fogsound12.github.io/zhejiang-puzzle</a>
-      </div>
-    </div>
   </header>
   <div class="city-grid" id="cityGrid"></div>
 </div>
 
-<!-- Screen 2: Puzzle -->
 <div class="screen" id="screen-puzzle">
   <div class="puzzle-header">
     <button class="btn-back" id="btnBack">← 返回</button>
     <h2 id="cityName"></h2>
   </div>
-
   <div class="board-wrap">
-    <div class="ref-hint" id="refHint">
+    <div class="ref-hint">
       <img id="refThumb" alt="">
       <span>参考</span>
     </div>
     <div class="board-grid" id="boardGrid"></div>
   </div>
-
   <div style="flex-shrink:0;display:flex;align-items:center;justify-content:center;gap:14px;padding:3px 12px;font-size:12px">
     <span style="color:#aaa">步数: <span id="moveCount" style="color:#ffd200;font-weight:700">0</span></span>
     <span style="color:#666">|</span>
@@ -168,14 +174,12 @@ header p{color:#888;font-size:13px;margin-top:4px}
     <span style="color:#666">|</span>
     <button id="btnReset" style="background:#2a2a3e;border:1px solid #444;color:#ccc;padding:3px 12px;border-radius:5px;cursor:pointer;font-size:11px;touch-action:auto">重排</button>
   </div>
-
   <div class="tray-wrap">
     <div class="tray-label">按住碎片拖到上方拼图区</div>
     <div class="tray-pieces" id="tray"></div>
   </div>
 </div>
 
-<!-- Victory -->
 <div id="victoryModal" style="display:none"></div>
 <canvas id="confettiCanvas"></canvas>
 
@@ -189,24 +193,18 @@ const CITIES = [
 const COLS=4,ROWS=3,TOTAL=12,IMG_PATH="images/";
 
 let state={
-  placed:{},      // {cellIdx: pieceId}
-  tray:[],        // [pieceId,...]
-  dataUrls:[],    // [dataUrl0-11]
-  moves:0,
-  solved:false,
-  city:""
+  placed:{},tray:[],dataUrls:[],moves:0,solved:false,city:""
 };
 
 // Stars
 (function(){
   const c=document.getElementById("stars");
-  for(let i=80;i--;){const s=document.createElement("div");s.className="star";
+  for(let i=60;i--;){const s=document.createElement("div");s.className="star";
     s.style.left=Math.random()*100+"%";s.style.top=Math.random()*100+"%";
     s.style.animationDelay=Math.random()*3+"s";s.style.width=s.style.height=(Math.random()*2+1)+"px";
     c.appendChild(s)}
 })();
 
-// City Grid
 function initCityGrid(){
   document.getElementById("cityGrid").innerHTML="";
   CITIES.forEach(c=>{
@@ -217,227 +215,155 @@ function initCityGrid(){
   })
 }
 
-// Slice image
+// Faster slice: reuse canvas, lower quality
 function sliceImage(img){
   const iw=img.naturalWidth,ih=img.naturalHeight,tr=COLS/ROWS;
   let cx,cy,cw_,ch_;
   if(iw/ih>tr){ch_=ih;cw_=ih*tr;cx=(iw-cw_)/2;cy=0}
   else{cw_=iw;ch_=iw/tr;cx=0;cy=(ih-ch_)/2}
-  const mc=document.createElement("canvas");mc.width=600;mc.height=450;
-  mc.getContext("2d").drawImage(img,cx,cy,cw_,ch_,0,0,600,450);
-  const pw=150,ph=150,urls=[];
+  const mc=document.createElement("canvas");mc.width=400;mc.height=300;
+  mc.getContext("2d").drawImage(img,cx,cy,cw_,ch_,0,0,400,300);
+  const pw=100,ph=100,urls=new Array(TOTAL);
+  const pc=document.createElement("canvas");pc.width=pw;pc.height=ph;
+  const pctx=pc.getContext("2d");
   for(let i=0;i<TOTAL;i++){
-    const col=i%COLS,row=Math.floor(i/COLS);
-    const pc=document.createElement("canvas");pc.width=pw;pc.height=ph;
-    pc.getContext("2d").drawImage(mc,col*pw,row*ph,pw,ph,0,0,pw,ph);
-    urls[i]=pc.toDataURL("image/jpeg",0.85)
+    const col=i%COLS,row=(i/COLS)|0;
+    pctx.clearRect(0,0,pw,ph);
+    pctx.drawImage(mc,col*pw,row*ph,pw,ph,0,0,pw,ph);
+    urls[i]=pc.toDataURL("image/jpeg",0.75)
   }
   return urls
 }
 
-// ===== Drag System =====
-let drag=null; // {pid, ghost, offsetX, offsetY, startCell, origRect}
+// Drag
+let drag=null;
 
 function setupDrag(){
-  // Use pointer events for unified mouse+touch
-  document.addEventListener("pointerdown",onPointerDown,{passive:false});
-  document.addEventListener("pointermove",onPointerMove,{passive:false});
-  document.addEventListener("pointerup",onPointerUp,{passive:false});
-  document.addEventListener("pointercancel",onPointerUp,{passive:false});
+  document.addEventListener("pointerdown",onDown,{passive:false});
+  document.addEventListener("pointermove",onMove,{passive:false});
+  document.addEventListener("pointerup",onUp,{passive:false});
+  document.addEventListener("pointercancel",onUp,{passive:false});
 }
 
-function getTrayPiece(e){
+function onDown(e){
+  if(state.solved)return;
   let el=e.target;
   while(el&&!el.classList.contains("tray-piece"))el=el.parentElement;
-  if(!el||el.closest(".tray-empty"))return null;
-  return el
-}
-
-function getBoardCell(e){
-  let el=e.target;
-  while(el&&!el.classList.contains("board-cell"))el=el.parentElement;
-  return el
-}
-
-function onPointerDown(e){
-  if(state.solved)return;
-  // Check if starting from tray piece
-  const trayEl=getTrayPiece(e);
-  if(trayEl){
-    e.preventDefault();
-    const pid=parseInt(trayEl.dataset.pid);
-    const rect=trayEl.getBoundingClientRect();
-    // Create ghost
-    const ghost=document.createElement("div");ghost.className="drag-ghost";
-    ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
-    ghost.style.left=rect.left+"px";ghost.style.top=rect.top+"px";
-    ghost.innerHTML=`<img src="${state.dataUrls[pid]}">`;
-    document.body.appendChild(ghost);
-    trayEl.classList.add("dragging");
-    drag={pid,ghost,offsetX:e.clientX-rect.left,offsetY:e.clientY-rect.top};
-    // Clear any cell drag-over
-    document.querySelectorAll(".board-cell.drag-over").forEach(c=>c.classList.remove("drag-over"));
+  if(!el||el.closest(".tray-empty")){
+    // Check tap on placed piece
+    let cell=e.target;
+    while(cell&&!cell.classList.contains("board-cell"))cell=cell.parentElement;
+    if(cell){
+      const idx=parseInt(cell.dataset.idx);
+      if(state.placed[idx]!==undefined){
+        e.preventDefault();
+        const pid=state.placed[idx];
+        delete state.placed[idx];
+        state.tray.push(pid);
+        state.moves++;
+        document.getElementById("moveCount").textContent=state.moves;
+        updateBoard();renderTray();checkWin()
+      }
+    }
     return
   }
-  // Check if clicking on a placed piece to remove it
-  const cellEl=getBoardCell(e);
-  if(cellEl){
-    const idx=parseInt(cellEl.dataset.idx);
-    if(state.placed[idx]!==undefined&&!state.solved){
-      e.preventDefault();
-      // Return piece to tray
-      const pid=state.placed[idx];
-      delete state.placed[idx];
-      state.tray.push(pid);
-      state.moves++;
-      document.getElementById("moveCount").textContent=state.moves;
-      updateBoard();
-      renderTray();
-      checkWin()
-    }
-  }
+  e.preventDefault();
+  const pid=parseInt(el.dataset.pid);
+  const rect=el.getBoundingClientRect();
+  const ghost=document.createElement("div");ghost.className="drag-ghost";
+  ghost.style.width=rect.width+"px";ghost.style.height=rect.height+"px";
+  ghost.innerHTML=`<img src="${state.dataUrls[pid]}">`;
+  document.body.appendChild(ghost);
+  el.classList.add("dragging");
+  drag={pid,ghost,ox:e.clientX-rect.left,oy:e.clientY-rect.top};
+  drag.tx=rect.left;drag.ty=rect.top; // initial position
+  ghost.style.transform=`translate(${rect.left}px,${rect.top}px)`;
+  document.querySelectorAll(".board-cell.drag-over").forEach(c=>c.classList.remove("drag-over"))
 }
 
-function onPointerMove(e){
+function onMove(e){
   if(!drag)return;
   e.preventDefault();
-  drag.ghost.style.left=(e.clientX-drag.offsetX)+"px";
-  drag.ghost.style.top=(e.clientY-drag.offsetY)+"px";
-  // Highlight cell under cursor
+  drag.ghost.style.transform=`translate(${e.clientX-drag.ox}px,${e.clientY-drag.oy}px)`;
   document.querySelectorAll(".board-cell.drag-over").forEach(c=>c.classList.remove("drag-over"));
   const under=document.elementFromPoint(e.clientX,e.clientY);
-  if(under){
-    const cell=under.closest(".board-cell");
-    if(cell&&!cell.classList.contains("filled"))cell.classList.add("drag-over")
-  }
+  if(under){const cell=under.closest(".board-cell");
+    if(cell&&!cell.classList.contains("filled"))cell.classList.add("drag-over")}
 }
 
-function onPointerUp(e){
+function onUp(e){
   if(!drag)return;
   drag.ghost.remove();
   const orig=document.querySelector(`.tray-piece[data-pid="${drag.pid}"]`);
   if(orig)orig.classList.remove("dragging");
   document.querySelectorAll(".board-cell.drag-over").forEach(c=>c.classList.remove("drag-over"));
-  // Check if dropped on board cell
   const under=document.elementFromPoint(e.clientX,e.clientY);
-  let placed=false;
-  if(under){
-    const cell=under.closest(".board-cell");
+  if(under){const cell=under.closest(".board-cell");
     if(cell&&!cell.classList.contains("filled")){
       const idx=parseInt(cell.dataset.idx);
-      // Place piece
       state.placed[idx]=drag.pid;
       state.tray=state.tray.filter(p=>p!==drag.pid);
-      state.moves++;
-      document.getElementById("moveCount").textContent=state.moves;
-      updateBoard();
-      renderTray();
-      placed=true;
-      checkWin()
+      state.moves++;document.getElementById("moveCount").textContent=state.moves;
+      updateBoard();renderTray();drag=null;checkWin();return
     }
   }
   drag=null;
-  if(!placed&&orig){
-    // Quick shake animation to show piece returned
-    orig.style.transition="transform .15s";
-    orig.style.transform="translateX(-4px)";
-    setTimeout(()=>{orig.style.transform="translateX(4px)"},50);
-    setTimeout(()=>{orig.style.transform="none"},100)
-  }
+  if(orig){orig.style.transition="transform .1s";orig.style.transform="translateX(-3px)";
+    setTimeout(()=>{orig.style.transform="translateX(3px)"},40);
+    setTimeout(()=>{orig.style.transform="none"},80)}
 }
 
-// ===== Start Puzzle =====
 function startPuzzle(city){
   state.moves=0;state.solved=false;state.city=city.name;
-  document.getElementById("cityName").textContent=city.name+" · 美食记忆";
+  document.getElementById("cityName").textContent=city.name+" · 寻味浙江";
   document.getElementById("moveCount").textContent="0";
   document.getElementById("refThumb").src=IMG_PATH+city.file;
-  // Reset tray count
   document.querySelector("#trayCount span").textContent="12";
-
   const img=new Image();
-  img.onload=()=>{
-    state.dataUrls=sliceImage(img);
-    buildGame()
-  };
+  img.onload=()=>{state.dataUrls=sliceImage(img);buildGame()};
   img.onerror=()=>{
-    const c=document.createElement("canvas");c.width=600;c.height=450;
-    const ctx=c.getContext("2d");ctx.fillStyle="#333";ctx.fillRect(0,0,600,450);
-    ctx.fillStyle="#fff";ctx.font="24px sans-serif";ctx.textAlign="center";
-    ctx.fillText("图片加载失败",300,225);
-    const urls=[];const pw=150,ph=150;
-    for(let i=0;i<TOTAL;i++){
-      const col=i%COLS,row=Math.floor(i/COLS);
-      const pc=document.createElement("canvas");pc.width=pw;pc.height=ph;
-      pc.getContext("2d").drawImage(c,col*pw,row*ph,pw,ph,0,0,pw,ph);
-      urls[i]=pc.toDataURL()
-    }
+    const c=document.createElement("canvas");c.width=400;c.height=300;
+    const ctx=c.getContext("2d");ctx.fillStyle="#333";ctx.fillRect(0,0,400,300);
+    ctx.fillStyle="#fff";ctx.font="20px sans-serif";ctx.textAlign="center";
+    ctx.fillText("图片加载失败",200,150);
+    const urls=[],pw=100,ph=100,pc=document.createElement("canvas");pc.width=pw;pc.height=ph;const pctx=pc.getContext("2d");
+    for(let i=0;i<TOTAL;i++){const col=i%COLS,row=(i/COLS)|0;
+      pctx.clearRect(0,0,pw,ph);pctx.drawImage(c,col*pw,row*ph,pw,ph,0,0,pw,ph);
+      urls[i]=pc.toDataURL()}
     state.dataUrls=urls;buildGame()
   };
   img.src=IMG_PATH+city.file;
   showScreen("screen-puzzle")
 }
 
-function buildGame(){
-  state.placed={};
-  state.tray=Array.from({length:TOTAL},(_,i)=>i);
-  shuffle(state.tray);
-  initBoard();
-  renderTray()
-}
-
-function shuffle(arr){
-  for(let i=arr.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[arr[i],arr[j]]=[arr[j],arr[i]]}
-}
+function buildGame(){state.placed={};state.tray=Array.from({length:TOTAL},(_,i)=>i);shuffle(state.tray);initBoard();renderTray()}
+function shuffle(arr){for(let i=arr.length-1;i>0;i--){const j=Math.random()*i|0;[arr[i],arr[j]]=[arr[j],arr[i]}}
 
 function initBoard(){
   const grid=document.getElementById("boardGrid");grid.innerHTML="";
-  for(let i=0;i<TOTAL;i++){
-    const cell=document.createElement("div");cell.className="board-cell";cell.dataset.idx=i;
-    grid.appendChild(cell)
-  }
+  for(let i=0;i<TOTAL;i++){const cell=document.createElement("div");cell.className="board-cell";cell.dataset.idx=i;grid.appendChild(cell)}
   updateBoard()
 }
 
 function updateBoard(){
-  const cells=document.querySelectorAll(".board-cell");
-  let filled=0;
-  cells.forEach((c,i)=>{
-    const pid=state.placed[i];
-    if(pid!==undefined){
-      c.classList.add("filled");
-      c.style.backgroundImage=`url('${state.dataUrls[pid]}')`;
-      c.classList.toggle("correct",pid===i);
-      filled++
-    }else{
-      c.classList.remove("filled");
-      c.style.backgroundImage="";
-      c.classList.remove("correct")
-    }
-  });
-  document.querySelector("#trayCount span").textContent=TOTAL-filled
+  const cells=document.querySelectorAll(".board-cell");let filled=0;
+  cells.forEach((c,i)=>{const pid=state.placed[i];
+    if(pid!==undefined){c.classList.add("filled");c.style.backgroundImage=`url('${state.dataUrls[pid]}')`;c.classList.toggle("correct",pid===i);filled++}
+    else{c.classList.remove("filled");c.style.backgroundImage="";c.classList.remove("correct")}
+  });document.querySelector("#trayCount span").textContent=TOTAL-filled
 }
 
 function renderTray(){
   const tray=document.getElementById("tray");tray.innerHTML="";
-  if(state.tray.length===0){
-    tray.innerHTML='<div class="tray-empty">全部放置完成</div>';return
-  }
-  state.tray.forEach(pid=>{
-    const div=document.createElement("div");div.className="tray-piece";div.dataset.pid=pid;
-    div.innerHTML=`<img src="${state.dataUrls[pid]}">`;
-    tray.appendChild(div)
-  })
+  if(state.tray.length===0){tray.innerHTML='<div class="tray-empty">全部放置完成</div>';return}
+  state.tray.forEach(pid=>{const div=document.createElement("div");div.className="tray-piece";div.dataset.pid=pid;
+    div.innerHTML=`<img src="${state.dataUrls[pid]}">`;tray.appendChild(div)})
 }
 
 function checkWin(){
   if(Object.keys(state.placed).length===TOTAL){
-    let allOk=true;
-    for(let i=0;i<TOTAL;i++){if(state.placed[i]!==i){allOk=false;break}}
-    if(allOk){
-      state.solved=true;
-      setTimeout(showVictory,500)
-    }
+    for(let i=0;i<TOTAL;i++){if(state.placed[i]!==i)return}
+    state.solved=true;setTimeout(showVictory,400)
   }
 }
 
@@ -446,33 +372,116 @@ function showScreen(id){
   document.getElementById(id).classList.add("active")
 }
 
-// Victory
+// ===== Certificate + Victory =====
 function showVictory(){
   const c=document.getElementById("victoryModal");
   const o=document.createElement("div");o.className="modal-overlay";
   o.onclick=e=>{if(e.target===o)closeVic()};
   const m=document.createElement("div");m.className="modal-content";
-  m.innerHTML='<div class="modal-icon">🏆</div><h2>恭喜你成功寻回'+state.city+'的美食记忆</h2><div class="sub-text">共用 <span>'+state.moves+'</span> 步完成挑战</div><button class="btn-primary" id="btnContinue">继续挑战其他城市</button>';
+  m.innerHTML=
+    '<div class="cert-wrap"><img src="images/奖牌.jpg" class="cert-img" id="certImg"></div>'+
+    '<h2>恭喜你成功寻回<span style="color:#f7971e">'+state.city+'</span>的美食记忆</h2>'+
+    '<div class="sub-text">共用 <span>'+state.moves+'</span> 步完成挑战，成功寻味浙江</div>'+
+    '<div class="btn-row">'+
+      '<button class="btn-primary" id="btnCertSave">保存奖状</button>'+
+      '<button class="btn-secondary" id="btnCertNext">继续挑战</button>'+
+    '</div>';
   o.appendChild(m);c.innerHTML="";c.appendChild(o);c.style.display="block";
-  document.getElementById("btnContinue").addEventListener("click",closeVic);startConfetti()
+  // Zoom cert on click
+  document.getElementById("certImg").addEventListener("click",showCertZoom);
+  document.getElementById("btnCertSave").addEventListener("click",downloadCert);
+  document.getElementById("btnCertNext").addEventListener("click",closeVic);
+  startConfetti()
 }
+
+function showCertZoom(){
+  const existing=document.querySelector(".cert-overlay");if(existing)existing.remove();
+  const ov=document.createElement("div");ov.className="cert-overlay";
+  ov.onclick=e=>{if(e.target===ov)ov.remove()};
+  const close=document.createElement("button");close.className="cert-close";close.textContent="✕";
+  close.onclick=()=>ov.remove();
+  const img=document.createElement("img");img.src="images/奖牌.jpg";
+  ov.appendChild(close);ov.appendChild(img);document.body.appendChild(ov)
+}
+
+function downloadCert(){
+  // Compose certificate on canvas and download
+  const medal=new Image();
+  medal.crossOrigin="anonymous";
+  medal.onload=()=>{
+    const cv=document.createElement("canvas");cv.width=600;cv.height=800;
+    const ctx=cv.getContext("2d");
+    // Background
+    const grad=ctx.createLinearGradient(0,0,0,800);
+    grad.addColorStop(0,"#1a1a2e");grad.addColorStop(1,"#16213e");
+    ctx.fillStyle=grad;ctx.fillRect(0,0,600,800);
+    // Border
+    ctx.strokeStyle="#f7971e";ctx.lineWidth=4;
+    ctx.strokeRect(20,20,560,760);
+    // Title
+    ctx.fillStyle="#ffd200";ctx.font="bold 28px sans-serif";ctx.textAlign="center";
+    ctx.fillText("浙江寻宝记云上展",300,80);
+    // Medal
+    ctx.drawImage(medal,200,110,200,200);
+    // Content
+    ctx.fillStyle="#f7971e";ctx.font="bold 22px sans-serif";
+    ctx.fillText("恭喜你成功寻回",300,380);
+    ctx.fillStyle="#ffd200";ctx.font="bold 26px sans-serif";
+    ctx.fillText(state.city+"的美食记忆",300,420);
+    ctx.fillStyle="#aaa";ctx.font="16px sans-serif";
+    ctx.fillText("共用 "+state.moves+" 步完成挑战",300,470);
+    ctx.fillText("成功寻味浙江",300,500);
+    // Decorative line
+    ctx.strokeStyle="rgba(247,151,30,.3)";ctx.lineWidth=1;
+    ctx.beginPath();ctx.moveTo(100,540);ctx.lineTo(500,540);ctx.stroke();
+    // Footer
+    ctx.fillStyle="#666";ctx.font="12px sans-serif";
+    ctx.fillText("浙江寻宝记云上展 · 寻味浙江",300,580);
+    // Download
+    const a=document.createElement("a");
+    a.download="寻味浙江-"+state.city+".png";
+    a.href=cv.toDataURL("image/png");a.click()
+  };
+  medal.onerror=()=>{
+    // Fallback: download without medal image
+    const cv=document.createElement("canvas");cv.width=600;cv.height=800;
+    const ctx=cv.getContext("2d");
+    const grad=ctx.createLinearGradient(0,0,0,800);
+    grad.addColorStop(0,"#1a1a2e");grad.addColorStop(1,"#16213e");
+    ctx.fillStyle=grad;ctx.fillRect(0,0,600,800);
+    ctx.strokeStyle="#f7971e";ctx.lineWidth=4;
+    ctx.strokeRect(20,20,560,760);
+    ctx.fillStyle="#ffd200";ctx.font="bold 28px sans-serif";ctx.textAlign="center";
+    ctx.fillText("浙江寻宝记云上展",300,80);
+    ctx.fillStyle="#f7971e";ctx.font="bold 22px sans-serif";
+    ctx.fillText("恭喜你成功寻回",300,380);
+    ctx.fillStyle="#ffd200";ctx.font="bold 26px sans-serif";
+    ctx.fillText(state.city+"的美食记忆",300,420);
+    ctx.fillStyle="#aaa";ctx.font="16px sans-serif";
+    ctx.fillText("共用 "+state.moves+" 步完成挑战",300,470);
+    const a=document.createElement("a");
+    a.download="寻味浙江-"+state.city+".png";
+    a.href=cv.toDataURL("image/png");a.click()
+  };
+  medal.src="images/奖牌.jpg"
+}
+
 function closeVic(){document.getElementById("victoryModal").style.display="none";stopConfetti();showScreen("screen-select")}
 
-// Confetti
+// Confetti (lighter)
 let cfId=null,cfP=[];
 function startConfetti(){
   const ca=document.getElementById("confettiCanvas");ca.width=innerWidth;ca.height=innerHeight;
   const ctx=ca.getContext("2d");const cl=["#f7971e","#ffd200","#e74c3c","#2ecc71","#3498db","#9b59b6","#1abc9c"];
-  cfP=[];for(let i=150;i--;)cfP.push({x:Math.random()*ca.width,y:Math.random()*ca.height-ca.height,w:Math.random()*8+4,h:Math.random()*6+3,color:cl[i%cl.length],vx:(Math.random()-.5)*2,vy:Math.random()*3+2,rot:Math.random()*360,rotS:(Math.random()-.5)*6,op:Math.random()*.5+.5});
+  cfP=[];for(let i=100;i--;)cfP.push({x:Math.random()*ca.width,y:Math.random()*ca.height-ca.height,w:Math.random()*6+3,h:Math.random()*5+2,color:cl[i%cl.length],vx:(Math.random()-.5)*1.5,vy:Math.random()*2.5+1.5,rot:Math.random()*360,rotS:(Math.random()-.5)*5,op:Math.random()*.4+.4});
   let f=0;(function anim(){f++;ctx.clearRect(0,0,ca.width,ca.height);
-    cfP.forEach(p=>{p.x+=p.vx+Math.sin(f*.02+p.y*.01)*.5;p.y+=p.vy;p.vy+=.05;p.rot+=p.rotS;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.globalAlpha=p.op;ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()});
-    cfP.forEach(p=>{if(p.y>ca.height+20){p.y=-20;p.x=Math.random()*ca.width;p.vy=Math.random()*3+2}});
+    cfP.forEach(p=>{p.x+=p.vx+Math.sin(f*.02+p.y*.01)*.3;p.y+=p.vy;p.vy+=.04;p.rot+=p.rotS;ctx.save();ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);ctx.globalAlpha=p.op;ctx.fillStyle=p.color;ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h);ctx.restore()});
+    cfP.forEach(p=>{if(p.y>ca.height+20){p.y=-20;p.x=Math.random()*ca.width;p.vy=Math.random()*2.5+1.5}});
     cfId=requestAnimationFrame(anim)})()
 }
 function stopConfetti(){if(cfId){cancelAnimationFrame(cfId);cfId=null}
   document.getElementById("confettiCanvas").getContext("2d").clearRect(0,0,innerWidth,innerHeight)}
 
-// Events
 document.getElementById("btnBack").addEventListener("click",()=>{stopConfetti();showScreen("screen-select")});
 document.getElementById("btnReset").addEventListener("click",()=>{
   if(state.dataUrls.length===0)return;
@@ -482,9 +491,7 @@ document.getElementById("btnReset").addEventListener("click",()=>{
   updateBoard();renderTray()
 });
 
-// Init
-setupDrag();
-initCityGrid();
+setupDrag();initCityGrid();
 </script>
 </body>
 </html>
