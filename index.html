@@ -30,6 +30,33 @@ header p {
     font-size: 14px;
     margin-top: 6px;
 }
+.qr-section {
+    text-align: center;
+    margin: 6px auto 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.qr-section img {
+    width: 60px;
+    height: 60px;
+    border-radius: 6px;
+    border: 1px solid #333;
+    cursor: pointer;
+}
+.qr-section .url-text {
+    font-size: 11px;
+    color: #666;
+    max-width: 200px;
+    word-break: break-all;
+    line-height: 1.4;
+}
+.qr-section .url-text a {
+    color: #f7971e;
+    text-decoration: none;
+}
 .screen { display: none; }
 .screen.active { display: block; }
 
@@ -297,6 +324,13 @@ header p {
     <header>
         <h1>浙江城市美食记忆拼图</h1>
         <p>选择一座城市，拼回它的美食记忆碎片</p>
+        <div class="qr-section">
+            <img src="QR码.png" alt="手机扫码游玩" id="qrCodeImg" title="手机扫码打开">
+            <div class="url-text">
+                手机扫码游玩<br>
+                <a href="https://fogsound12.github.io/zhejiang-puzzle/" target="_blank">fogsound12.github.io/zhejiang-puzzle</a>
+            </div>
+        </div>
     </header>
     <div class="city-grid" id="cityGrid"></div>
 </div>
