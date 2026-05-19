@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>浙江城市美食记忆拼图</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans SC", sans-serif;
+    background: #0f0f1a;
+    color: #e0e0e0;
+    min-height: 100vh;
+    overflow-x: hidden;
+}
+header {
+    text-align: center;
+    padding: 24px 16px 16px;
+}
+header h1 {
+    font-size: 26px;
+    font-weight: 700;
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+header p {
+    color: #888;
+    font-size: 14px;
+    margin-top: 6px;
+}
+.screen { display: none; }
+.screen.active { display: block; }
+
+/* City Selection */
+.city-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 12px;
+    padding: 16px;
+    max-width: 900px;
+    margin: 0 auto;
+}
+.city-card {
+    position: relative;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+    aspect-ratio: 4 / 3;
+    background: #1a1a2e;
+    border: 2px solid #2a2a3e;
+    transition: transform 0.2s, border-color 0.2s;
+}
+.city-card:hover {
+    transform: translateY(-3px);
+    border-color: #f7971e;
+}
+.city-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+.city-card .city-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 30px 10px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.85));
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    text-align: center;
+}
+
+/* Puzzle Header */
+.puzzle-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 16px;
+    padding: 16px;
+    position: relative;
+}
+.btn-back {
+    position: absolute;
+    left: 16px;
+    background: #2a2a3e;
+    border: none;
+    color: #ccc;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s;
+}
+.btn-back:hover { background: #3a3a4e; }
+.puzzle-header h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #f7971e;
+}
+
+/* Puzzle Layout */
+.puzzle-layout {
+    display: flex;
+    gap: 24px;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 16px 32px;
+    align-items: flex-start;
+}
+@media (max-width: 640px) {
+    .puzzle-layout { flex-direction: column; align-items: center; }
+}
+
+.reference-col {
+    flex-shrink: 0;
+    width: 160px;
+    text-align: center;
+}
+@media (max-width: 640px) {
+    .reference-col { width: 100%; max-width: 300px; }
+}
+.reference-frame {
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #333;
+    background: #1a1a2e;
+}
+.reference-frame img {
+    width: 100%;
+    display: block;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+}
+.ref-label {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+}
+.stats {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #aaa;
+}
+.stats span { color: #ffd200; font-weight: 700; }
+.btn-reset {
+    margin-top: 12px;
+    background: #2a2a3e;
+    border: 1px solid #444;
+    color: #ccc;
+    padding: 8px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+    width: 100%;
+}
+.btn-reset:hover { background: #3a3a4e; border-color: #f7971e; }
+
+/* Puzzle Grid */
+.puzzle-grid-wrapper {
+    flex: 1;
+    max-width: 520px;
+}
+.puzzle-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 3px;
+    width: 100%;
+}
+.piece-cell {
+    aspect-ratio: 1;
+    background-repeat: no-repeat;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 2px solid #333;
+    transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s, opacity 0.3s;
+    position: relative;
+}
+.piece-cell:active {
+    transform: scale(0.96);
+}
+.piece-cell.selected {
+    border-color: #f7971e;
+    transform: scale(1.04);
+    box-shadow: 0 0 16px rgba(247,151,30,0.5);
+    z-index: 2;
+}
+.piece-cell.correct {
+    border-color: #4caf50;
+    opacity: 0.85;
+}
+.piece-cell.correct::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(76,175,80,0.1);
+    border-radius: 4px;
+    pointer-events: none;
+}
+
+/* Victory Modal */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100;
+    animation: fadeIn 0.4s;
+}
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+.modal-content {
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 2px solid #f7971e;
+    border-radius: 20px;
+    padding: 40px 36px 32px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    animation: scaleIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    position: relative;
+    z-index: 101;
+}
+@keyframes scaleIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+.modal-content h2 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #ffd200;
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+.modal-content .sub-text {
+    color: #aaa;
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+.modal-content .sub-text span { color: #ffd200; font-weight: 700; }
+.btn-primary {
+    background: linear-gradient(135deg, #f7971e, #ffd200);
+    border: none;
+    color: #1a1a2e;
+    font-weight: 700;
+    padding: 12px 32px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(247,151,30,0.4);
+}
+
+/* Confetti Canvas */
+#confettiCanvas {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 99;
+}
+
+/* Stars Background */
+.stars { position: fixed; inset: 0; pointer-events: none; z-index: -1; overflow: hidden; }
+.star {
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #fff;
+    border-radius: 50%;
+    opacity: 0.3;
+    animation: twinkle 3s ease-in-out infinite;
+}
+@keyframes twinkle {
+    0%, 100% { opacity: 0.2; }
+    50% { opacity: 0.6; }
+}
+</style>
+</head>
+<body>
+
+<div class="stars" id="stars"></div>
+
+<!-- Screen 1: City Selection -->
+<div class="screen active" id="screen-select">
+    <header>
+        <h1>浙江城市美食记忆拼图</h1>
+        <p>选择一座城市，拼回它的美食记忆碎片</p>
+    </header>
+    <div class="city-grid" id="cityGrid"></div>
+</div>
+
+<!-- Screen 2: Puzzle -->
+<div class="screen" id="screen-puzzle">
+    <div class="puzzle-header">
+        <button class="btn-back" id="btnBack">← 返回</button>
+        <h2 id="cityName"></h2>
+    </div>
+    <div class="puzzle-layout">
+        <div class="reference-col">
+            <div class="reference-frame">
+                <img id="refImage" alt="参考图">
+            </div>
+            <div class="ref-label">参考图</div>
+            <div class="stats">
+                步数: <span id="moveCount">0</span>
+            </div>
+            <button class="btn-reset" id="btnReset">重新打乱</button>
+        </div>
+        <div class="puzzle-grid-wrapper">
+            <div class="puzzle-grid" id="puzzleGrid"></div>
+        </div>
+    </div>
+</div>
+
+<!-- Victory Modal -->
+<div id="victoryModal" style="display:none;"></div>
+
+<canvas id="confettiCanvas"></canvas>
+
+<script>
+const cities = [
+    { name: "杭州", file: "杭州.jpg" },
+    { name: "宁波", file: "宁波.jpg" },
+    { name: "温州", file: "温州.jpg" },
+    { name: "绍兴", file: "绍兴.jpg" },
+    { name: "湖州", file: "湖州.jpg" },
+    { name: "嘉兴", file: "嘉兴.jpg" },
+    { name: "金华", file: "金华.jpg" },
+    { name: "衢州", file: "衢州.jpg" },
+    { name: "舟山", file: "舟山.jpg" },
+    { name: "台州", file: "台州.jpg" },
+    { name: "丽水", file: "丽水.jpg" }
+];
+const IMG_PATH = "images/";
+const COLS = 4;
+const ROWS = 3;
+
+let state = {
+    positions: [],     // positions[i] = piece id (0-11) at grid position i
+    selected: -1,      // selected grid position
+    moves: 0,
+    imageUrl: "",
+    imageNatural: { w: 0, h: 0 },
+    solved: false,
+    currentCity: ""
+};
+
+// Stars Background
+(function() {
+    const c = document.getElementById("stars");
+    for (let i = 0; i < 80; i++) {
+        const s = document.createElement("div");
+        s.className = "star";
+        s.style.left = Math.random() * 100 + "%";
+        s.style.top = Math.random() * 100 + "%";
+        s.style.animationDelay = Math.random() * 3 + "s";
+        s.style.width = s.style.height = (Math.random() * 2 + 1) + "px";
+        c.appendChild(s);
+    }
+})();
+
+// City Grid
+function initCityGrid() {
+    const grid = document.getElementById("cityGrid");
+    grid.innerHTML = "";
+    cities.forEach(city => {
+        const card = document.createElement("div");
+        card.className = "city-card";
+        const img = document.createElement("img");
+        img.src = IMG_PATH + city.file;
+        img.alt = city.name;
+        img.loading = "lazy";
+        const label = document.createElement("div");
+        label.className = "city-label";
+        label.textContent = city.name;
+        card.appendChild(img);
+        card.appendChild(label);
+        card.addEventListener("click", () => startPuzzle(city));
+        grid.appendChild(card);
+    });
+}
+
+// Start Puzzle
+function startPuzzle(city) {
+    state.moves = 0;
+    state.selected = -1;
+    state.solved = false;
+    state.imageUrl = IMG_PATH + city.file;
+    state.currentCity = city.name;
+
+    document.getElementById("cityName").textContent = city.name + " · 美食记忆";
+    document.getElementById("moveCount").textContent = "0";
+    document.getElementById("refImage").src = state.imageUrl;
+
+    const img = new Image();
+    img.onload = () => {
+        state.imageNatural = { w: img.naturalWidth, h: img.naturalHeight };
+        buildGrid();
+    };
+    img.onerror = () => {
+        state.imageNatural = { w: 1024, h: 683 };
+        buildGrid();
+    };
+    img.src = state.imageUrl;
+
+    showScreen("screen-puzzle");
+}
+
+function buildGrid() {
+    const grid = document.getElementById("puzzleGrid");
+    grid.innerHTML = "";
+    for (let i = 0; i < COLS * ROWS; i++) {
+        const cell = document.createElement("div");
+        cell.className = "piece-cell";
+        cell.dataset.index = i;
+        cell.addEventListener("click", () => onCellClick(i));
+        grid.appendChild(cell);
+    }
+    shufflePieces();
+    requestAnimationFrame(() => requestAnimationFrame(renderAllPieces));
+}
+
+function shufflePieces() {
+    state.positions = Array.from({ length: COLS * ROWS }, (_, i) => i);
+    state.selected = -1;
+    state.solved = false;
+    state.moves = 0;
+    document.getElementById("moveCount").textContent = "0";
+    do { for (let i = state.positions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [state.positions[i], state.positions[j]] = [state.positions[j], state.positions[i]];
+    }} while (isSolved());
+    renderAllPieces();
+}
+
+function isSolved() {
+    return state.positions.every((p, i) => p === i);
+}
+
+function onCellClick(index) {
+    if (state.solved) return;
+    if (state.selected === -1) {
+        state.selected = index;
+        updateStyles();
+        return;
+    }
+    if (state.selected === index) {
+        state.selected = -1;
+        updateStyles();
+        return;
+    }
+    [state.positions[state.selected], state.positions[index]] =
+        [state.positions[index], state.positions[state.selected]];
+    state.moves++;
+    document.getElementById("moveCount").textContent = state.moves;
+    state.selected = -1;
+    renderAllPieces();
+    if (isSolved()) {
+        state.solved = true;
+        setTimeout(() => showVictory(), 400);
+    }
+}
+
+function updateStyles() {
+    document.querySelectorAll(".piece-cell").forEach((c, i) => {
+        c.classList.toggle("selected", i === state.selected);
+        c.classList.toggle("correct", !state.solved && state.positions[i] === i);
+    });
+}
+
+function renderAllPieces() {
+    const cells = document.querySelectorAll(".piece-cell");
+    for (let i = 0; i < cells.length; i++) renderPiece(i, cells);
+    updateStyles();
+}
+
+function renderPiece(idx, cells) {
+    const cell = cells[idx];
+    const pieceId = state.positions[idx];
+    const col = pieceId % COLS;
+    const row = Math.floor(pieceId / COLS);
+    const cw = cell.offsetWidth, ch = cell.offsetHeight;
+    if (cw === 0 || ch === 0) return;
+    const iw = state.imageNatural.w, ih = state.imageNatural.h;
+    if (iw === 0 || ih === 0) return;
+
+    // Center-crop to 4:3
+    const tr = COLS / ROWS;
+    let cx, cy, cw_, ch_;
+    if (iw / ih > tr) {
+        ch_ = ih; cw_ = ih * tr; cx = (iw - cw_) / 2; cy = 0;
+    } else {
+        cw_ = iw; ch_ = iw / tr; cx = 0; cy = (ih - ch_) / 2;
+    }
+
+    const bgW = iw * cw * COLS / cw_;
+    const bgH = ih * ch * ROWS / ch_;
+    const sx = cx + col * cw_ / COLS;
+    const sy = cy + row * ch_ / ROWS;
+
+    cell.style.backgroundImage = `url('${state.imageUrl}')`;
+    cell.style.backgroundSize = bgW + "px " + bgH + "px";
+    cell.style.backgroundPosition = (-sx * cw * COLS / cw_) + "px " + (-sy * ch * ROWS / ch_) + "px";
+}
+
+function showScreen(id) {
+    document.querySelectorAll(".screen").forEach(s => s.classList.remove("active"));
+    document.getElementById(id).classList.add("active");
+}
+
+// Victory
+function showVictory() {
+    const container = document.getElementById("victoryModal");
+    const overlay = document.createElement("div");
+    overlay.className = "modal-overlay";
+    overlay.onclick = (e) => { if (e.target === overlay) closeVictory(); };
+    const content = document.createElement("div");
+    content.className = "modal-content";
+    content.innerHTML =
+        '<div style="font-size:48px;margin-bottom:12px;line-height:1;">🏆</div>' +
+        '<h2>恭喜你成功寻回' + state.currentCity + '的美食记忆</h2>' +
+        '<div class="sub-text">共用 <span>' + state.moves + '</span> 步完成挑战</div>' +
+        '<button class="btn-primary" id="btnContinue">继续挑战其他城市</button>';
+    overlay.appendChild(content);
+    container.innerHTML = "";
+    container.appendChild(overlay);
+    container.style.display = "block";
+    document.getElementById("btnContinue").addEventListener("click", closeVictory);
+    startConfetti();
+}
+
+function closeVictory() {
+    document.getElementById("victoryModal").style.display = "none";
+    stopConfetti();
+    showScreen("screen-select");
+}
+
+// Confetti
+let confettiId = null, confettiParts = [];
+
+function startConfetti() {
+    const canvas = document.getElementById("confettiCanvas");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    const ctx = canvas.getContext("2d");
+    const colors = ["#f7971e","#ffd200","#e74c3c","#2ecc71","#3498db","#9b59b6","#1abc9c"];
+    confettiParts = [];
+    for (let i = 0; i < 150; i++) {
+        confettiParts.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height - canvas.height,
+            w: Math.random() * 8 + 4,
+            h: Math.random() * 6 + 3,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            vx: (Math.random() - 0.5) * 2,
+            vy: Math.random() * 3 + 2,
+            rot: Math.random() * 360,
+            rotS: (Math.random() - 0.5) * 6,
+            op: Math.random() * 0.5 + 0.5
+        });
+    }
+    let frame = 0;
+    function anim() {
+        frame++;
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        confettiParts.forEach(p => {
+            p.x += p.vx + Math.sin(frame * 0.02 + p.y * 0.01) * 0.5;
+            p.y += p.vy;
+            p.vy += 0.05;
+            p.rot += p.rotS;
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.rotate(p.rot * Math.PI / 180);
+            ctx.globalAlpha = p.op;
+            ctx.fillStyle = p.color;
+            ctx.fillRect(-p.w / 2, -p.h / 2, p.w, p.h);
+            ctx.restore();
+        });
+        confettiParts.forEach(p => {
+            if (p.y > canvas.height + 20) {
+                p.y = -20;
+                p.x = Math.random() * canvas.width;
+                p.vy = Math.random() * 3 + 2;
+            }
+        });
+        confettiId = requestAnimationFrame(anim);
+    }
+    anim();
+}
+
+function stopConfetti() {
+    if (confettiId) { cancelAnimationFrame(confettiId); confettiId = null; }
+    document.getElementById("confettiCanvas").getContext("2d").clearRect(0,0,window.innerWidth,window.innerHeight);
+}
+
+// Events
+document.getElementById("btnBack").addEventListener("click", () => { stopConfetti(); showScreen("screen-select"); });
+document.getElementById("btnReset").addEventListener("click", shufflePieces);
+let rt;
+window.addEventListener("resize", () => {
+    clearTimeout(rt);
+    rt = setTimeout(() => {
+        if (document.getElementById("screen-puzzle").classList.contains("active")) renderAllPieces();
+    }, 200);
+});
+
+initCityGrid();
+</script>
+</body>
+</html>
