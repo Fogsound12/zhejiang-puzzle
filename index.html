@@ -24,8 +24,10 @@ header{text-align:center;padding:20px 16px 12px}
 header h1{font-size:24px;font-weight:700;background:linear-gradient(135deg,#f7971e,#ffd200);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 header p{color:#888;font-size:13px;margin-top:4px}
 .city-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;padding:12px 16px 24px;max-width:850px;margin:0 auto}
-.city-card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;aspect-ratio:4/3;background:#1a1a2e;border:2px solid #2a2a3e;transition:transform .2s}
+.city-card{position:relative;border-radius:10px;overflow:hidden;cursor:pointer;background:#1a1a2e;border:2px solid #2a2a3e;transition:transform .2s}
+.city-card::before{content:"";display:block;padding-bottom:75%}
 .city-card:active{transform:scale(.96)}
+.city-card .card-inner{position:absolute;inset:0}
 .city-card img{width:100%;height:100%;object-fit:cover;display:block}
 .city-card .label{position:absolute;bottom:0;left:0;right:0;padding:24px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.85));font-size:15px;font-weight:600;color:#fff;text-align:center}
 
@@ -209,7 +211,8 @@ function initCityGrid(){
   document.getElementById("cityGrid").innerHTML="";
   CITIES.forEach(c=>{
     const card=document.createElement("div");card.className="city-card";
-    card.innerHTML=`<img src="${IMG_PATH+c.file}" alt="${c.name}" loading="lazy"><div class="label">${c.name}</div>`;
+    const src=IMG_PATH+encodeURIComponent(c.file);
+    card.innerHTML='<div class="card-inner"><img src="'+src+'" alt="'+c.name+'" loading="lazy"><div class="label">'+c.name+'</div></div>';
     card.addEventListener("click",()=>startPuzzle(c));
     document.getElementById("cityGrid").appendChild(card)
   })
@@ -317,7 +320,7 @@ function startPuzzle(city){
   state.moves=0;state.solved=false;state.city=city.name;
   document.getElementById("cityName").textContent=city.name+" · 寻味浙江";
   document.getElementById("moveCount").textContent="0";
-  document.getElementById("refThumb").src=IMG_PATH+city.file;
+  document.getElementById("refThumb").src=IMG_PATH+encodeURIComponent(city.file);
   document.querySelector("#trayCount span").textContent="12";
   const img=new Image();
   img.onload=()=>{state.dataUrls=sliceImage(img);buildGame()};
@@ -332,7 +335,7 @@ function startPuzzle(city){
       urls[i]=pc.toDataURL()}
     state.dataUrls=urls;buildGame()
   };
-  img.src=IMG_PATH+city.file;
+  img.src=IMG_PATH+encodeURIComponent(city.file);
   showScreen("screen-puzzle")
 }
 
@@ -379,7 +382,7 @@ function showVictory(){
   o.onclick=e=>{if(e.target===o)closeVic()};
   const m=document.createElement("div");m.className="modal-content";
   m.innerHTML=
-    '<div class="cert-wrap"><img src="images/奖牌.jpg" class="cert-img" id="certImg"></div>'+
+    '<div class="cert-wrap"><img src="images/%E5%A5%96%E7%89%8C.jpg" class="cert-img" id="certImg"></div>'+
     '<h2>恭喜你成功寻回<span style="color:#f7971e">'+state.city+'</span>的美食记忆</h2>'+
     '<div class="sub-text">共用 <span>'+state.moves+'</span> 步完成挑战，成功寻味浙江</div>'+
     '<div class="btn-row">'+
@@ -400,7 +403,7 @@ function showCertZoom(){
   ov.onclick=e=>{if(e.target===ov)ov.remove()};
   const close=document.createElement("button");close.className="cert-close";close.textContent="✕";
   close.onclick=()=>ov.remove();
-  const img=document.createElement("img");img.src="images/奖牌.jpg";
+  const img=document.createElement("img");img.src="images/%E5%A5%96%E7%89%8C.jpg";
   ov.appendChild(close);ov.appendChild(img);document.body.appendChild(ov)
 }
 
@@ -463,7 +466,7 @@ function downloadCert(){
     a.download="寻味浙江-"+state.city+".png";
     a.href=cv.toDataURL("image/png");a.click()
   };
-  medal.src="images/奖牌.jpg"
+  medal.src="images/%E5%A5%96%E7%89%8C.jpg"
 }
 
 function closeVic(){document.getElementById("victoryModal").style.display="none";stopConfetti();showScreen("screen-select")}
